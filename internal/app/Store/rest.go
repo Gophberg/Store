@@ -11,7 +11,11 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested create ad: %s\n", r.URL.Path)
 
 	a.decodeData(w, r)
-	log.Println("[REST] Decoded data to t type:", a)
+
+	// Validations
+	if len(a.Content) > 10 {
+		log.Println("[REST] The content is to large")
+	}
 
 	// Create new record
 	id, err := a.createRecord(a)
@@ -21,7 +25,7 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	log.Println("[REST] New ad created with id:", id)
 
 	// Sending response
-	js, err := json.Marshal("Ok")
+	js, err := json.Marshal(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

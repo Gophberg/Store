@@ -9,7 +9,6 @@ import (
 
 func ConnDB() (*sql.DB, error) {
 	url := fmt.Sprintf("host=%v user=%v password='%v' dbname=%v sslmode=disable", config.Dbhost, config.Dbusername, config.Dbpassword, config.Dbname)
-	log.Println(url)
 	db, err := sql.Open("postgres", url)
 	if err != nil {
 		return nil, err

@@ -12,20 +12,32 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 
 	a.decodeData(w, r)
 
-	// Validations
-	if len(a.Content) > 10 {
-		log.Println("[REST] The content is to large")
-	}
+	var result Result
 
-	// Create new record
-	id, err := a.createRecord(a)
-	if err != nil {
-		log.Println("[REST]", err)
+	// Validations
+	switch {
+	case len(a.Title) > 200:
+		log.Println("[REST] The title is to large")
+		result.Reason = "The title is to large"
+		result.Status = false
+	case len(a.Content) > 1000:
+		log.Println("[REST] The content is to large")
+		result.Reason = "The content is to large"
+		result.Status = false
+	default:
+		// Create new record
+		id, err := a.createRecord(a)
+		result.Id = id
+		result.Reason = "Add created"
+		result.Status = true
+		if err != nil {
+			log.Println("[REST]", err)
+		}
+		log.Println("[REST] New ad created with id:", id)
 	}
-	log.Println("[REST] New ad created with id:", id)
 
 	// Sending response
-	js, err := json.Marshal(id)
+	js, err := json.Marshal(result)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -99,5 +111,4 @@ func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request) {
 	if err := dec.Decode(&a); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	log.Printf("[REST] Data to decode: %v\n", &a)
 }

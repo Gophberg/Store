@@ -15,3 +15,9 @@ type Ad struct {
 	Photo   string  `json:"photo"`
 	Price   float64 `json:"price"`
 }
+
+type Result struct {
+	Id     int64
+	Status bool
+	Reason string
+}

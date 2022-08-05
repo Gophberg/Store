@@ -9,7 +9,6 @@ import (
 
 func (c *Config) NewConfig() {
 	f, err := os.Open("configs/store.yaml")
-	log.Println("[CONFIG]", f)
 	defer func(f *os.File) {
 		err := f.Close()
 		if err != nil {

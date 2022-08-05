@@ -9,8 +9,9 @@ type Config struct {
 }
 
 type Ad struct {
-	Id    int64   `json:"id"`
-	Title string  `json:"title"`
-	Photo string  `json:"photo"`
-	Price float64 `json:"price"`
+	Id      int64   `json:"id"`
+	Title   string  `json:"title"`
+	Content string  `json:"content"`
+	Photo   string  `json:"photo"`
+	Price   float64 `json:"price"`
 }

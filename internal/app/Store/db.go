@@ -32,9 +32,10 @@ func (a *Ad) createRecord(c Ad) (int64, error) {
 	log.Printf("[DB] Reseived createRecord Credentials: %v", c)
 
 	err = db.QueryRow(
-		`INSERT INTO store (title, photo, price) 
-		VALUES ($1, $2, $3) RETURNING id`,
+		`INSERT INTO store (title, content, photo, price) 
+		VALUES ($1, $2, $3, $4) RETURNING id`,
 		c.Title,
+		c.Content,
 		c.Photo,
 		c.Price,
 	).Scan(&a.Id)
@@ -55,9 +56,10 @@ func (a Ad) readRecord(c Ad) (Ad, error) {
 
 	log.Printf("[DB] Query request <%v> ad\n", c.Id)
 
-	query := fmt.Sprintf(`SELECT title, photo, price FROM store WHERE id = %d;`, c.Id)
+	query := fmt.Sprintf(`SELECT title, content, photo, price FROM store WHERE id = %d;`, c.Id)
 	if err := db.QueryRow(query).Scan(
 		&a.Title,
+		&a.Content,
 		&a.Photo,
 		&a.Price,
 	); err != nil {
@@ -93,6 +95,7 @@ func (a Ad) readRecords() ([]Ad, error) {
 		if err := rows.Scan(
 			&i.Id,
 			&i.Title,
+			&i.Content,
 			&i.Photo,
 			&i.Price,
 		); err != nil {

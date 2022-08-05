@@ -33,6 +33,28 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
+func (a Ad) getAd(w http.ResponseWriter, r *http.Request) {
+	log.Printf("[REST] Requested ad: %s\n", r.URL.Path)
+
+	a.decodeData(w, r)
+
+	ad, err := a.readRecord(a)
+	if err != nil {
+		log.Println("[REST]", err)
+	}
+
+	js, err := json.Marshal(ad)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	write, err := w.Write(js)
+	if err != nil {
+		return
+	}
+	log.Printf("[REST] %v bytes written to ResponseWriter", write)
+}
+
 func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)

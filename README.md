@@ -14,3 +14,10 @@
 
 You can to post your credentials in this request.  
 
+### Get Ad by ID
+
+*Do request*  
+`curl -X POST http://localhost:9000/getAd -H "Content-Type: application/json" --data '{"id": N}'`
+
+Where `N` is a number of Ad ID to get.  
+  

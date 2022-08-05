@@ -40,3 +40,31 @@ func (a *Ad) createRecord(c Ad) (int64, error) {
 	).Scan(&a.Id)
 	return a.Id, err
 }
+
+func (a Ad) readRecord(c Ad) (Ad, error) {
+	db, err := ConnDB()
+	if err != nil {
+		return a, err
+	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+
+		}
+	}(db)
+
+	log.Printf("[DB] Query request <%v> ad\n", c.Id)
+
+	query := fmt.Sprintf(`SELECT title, photo, price FROM store WHERE id = %d;`, c.Id)
+	if err := db.QueryRow(query).Scan(
+		&a.Title,
+		&a.Photo,
+		&a.Price,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return a, err
+		}
+	}
+	//log.Printf("[DB] Read record <%d>\n", a.Id)
+	return a, nil
+}

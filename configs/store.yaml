@@ -1,0 +1,5 @@
+dbhost: localhost
+dbname: store
+dbusername: postgres
+dbpassword: postgres
+dockerdbport: 5432

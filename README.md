@@ -20,4 +20,10 @@ You can to post your credentials in this request.
 `curl -X POST http://localhost:9000/getAd -H "Content-Type: application/json" --data '{"id": N}'`
 
 Where `N` is a number of Ad ID to get.  
-  
+
+### Get all Ads
+
+*Do request*  
+`curl -X POST http://localhost:9000/getAllAds`
+
+Note: Then just created my db contains the two test records

@@ -68,3 +68,37 @@ func (a Ad) readRecord(c Ad) (Ad, error) {
 	//log.Printf("[DB] Read record <%d>\n", a.Id)
 	return a, nil
 }
+
+func (a Ad) readRecords() ([]Ad, error) {
+	db, err := ConnDB()
+	if err != nil {
+		return nil, err
+	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+
+		}
+	}(db)
+
+	var ads []Ad
+
+	query := fmt.Sprintf(`SELECT * FROM store;`)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var i Ad
+		if err := rows.Scan(
+			&i.Id,
+			&i.Title,
+			&i.Photo,
+			&i.Price,
+		); err != nil {
+			return nil, err
+		}
+		ads = append(ads, i)
+	}
+	return ads, nil
+}

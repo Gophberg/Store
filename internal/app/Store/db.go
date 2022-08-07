@@ -1,39 +1,48 @@
 package Store
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgtype"
+	shopspring "github.com/jackc/pgtype/ext/shopspring-numeric"
+	"github.com/jackc/pgx/v4"
 	"log"
+	"os"
 	"time"
 )
 
-func ConnDB() (*sql.DB, error) {
-	url := fmt.Sprintf("host=%v user=%v password='%v' dbname=%v sslmode=disable", config.Dbhost, config.Dbusername, config.Dbpassword, config.Dbname)
-	db, err := sql.Open("postgres", url)
+func connDB() (*pgx.Conn, error) {
+	url := fmt.Sprintf("postgres://%v:%v@%v:%v/%v", config.Dbusername, config.Dbpassword, config.Dbhost, config.Dockerdbport, config.Dbname)
+	log.Println("[DB] uri", url)
+
+	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
-		return nil, err
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
 	}
-	return db, err
+
+	conn.ConnInfo().RegisterDataType(pgtype.DataType{
+		Value: &shopspring.Numeric{},
+		Name:  "numeric",
+		OID:   pgtype.NumericOID,
+	})
+
+	return conn, err
 }
 
 func (a *Ad) createRecord(c Ad) (int64, error) {
-	db, err := ConnDB()
+	conn, err := connDB()
 	if err != nil {
 		return 0, err
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			return
-		}
-	}(db)
 
 	log.Printf("[DB] Reseived createRecord Credentials: %v", c)
 
-	c.CreationDate = time.Now().Format(time.RFC3339)
+	c.CreationDate = time.Now()
+	//c.CreationDate = time.Now().Format(time.RFC3339)
 
-	err = db.QueryRow(
+	err = conn.QueryRow(context.Background(),
 		`INSERT INTO store (title, content, photo, price, createdate) 
 		VALUES ($1, $2, $3, $4, $5) RETURNING id`,
 		c.Title,
@@ -46,21 +55,15 @@ func (a *Ad) createRecord(c Ad) (int64, error) {
 }
 
 func (a Ad) readRecord(c Ad) (Ad, error) {
-	db, err := ConnDB()
+	conn, err := connDB()
 	if err != nil {
 		return a, err
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-
-		}
-	}(db)
 
 	log.Printf("[DB] Query request <%v> ad\n", c.Id)
 
 	query := fmt.Sprintf(`SELECT title, content, photo, price, createdate FROM store WHERE id = %d;`, c.Id)
-	if err := db.QueryRow(query).Scan(
+	if err := conn.QueryRow(context.Background(), query).Scan(
 		&a.Title,
 		&a.Content,
 		&a.Photo,
@@ -75,23 +78,27 @@ func (a Ad) readRecord(c Ad) (Ad, error) {
 	return a, nil
 }
 
-func (a Ad) readRecords() ([]Ad, error) {
-	db, err := ConnDB()
+func (a Ad) readRecords(qc QueryCredentials) ([]Ad, error) {
+	conn, err := connDB()
 	if err != nil {
 		return nil, err
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
+	defer func(conn *pgx.Conn, ctx context.Context) {
+		err := conn.Close(ctx)
 		if err != nil {
-
+			log.Println("[DB defer conn]", err)
 		}
-	}(db)
+	}(conn, context.Background())
 
 	var ads []Ad
 
-	query := fmt.Sprintf(`SELECT * FROM store;`)
-	rows, err := db.Query(query)
+	//SQL := ` SELECT "id","price" FROM "store" ORDER BY "id" LIMIT $2 OFFSET $1`
+
+	query := `SELECT * FROM "store" ORDER BY $1, $2 LIMIT $3 OFFSET $4`
+	//query := fmt.Sprintf(`SELECT * FROM store LIMIT 5 OFFSET 5;`)
+	rows, err := conn.Query(context.Background(), query, qc.By, qc.Order, qc.Limit, qc.Offset)
 	if err != nil {
+		log.Println("[DB query]", err)
 		return nil, err
 	}
 	for rows.Next() {
@@ -104,6 +111,7 @@ func (a Ad) readRecords() ([]Ad, error) {
 			&i.Price,
 			&i.CreationDate,
 		); err != nil {
+			log.Println("[DB loop]", err)
 			return nil, err
 		}
 		ads = append(ads, i)

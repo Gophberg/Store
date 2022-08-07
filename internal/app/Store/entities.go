@@ -1,24 +1,36 @@
 package Store
 
+import (
+	"github.com/shopspring/decimal"
+	"time"
+)
+
 type Config struct {
-	Dbhost       string `yaml:"dbhost"`
-	Dbname       string `yaml:"dbname"`
-	Dbusername   string `yaml:"dbusername"`
-	Dbpassword   string `yaml:"dbpassword"`
-	Dockerdbport string `yaml:"dockerdbport"`
+	Dbhost       string `env:"POSTGRES_HOST"`
+	Dbname       string `env:"POSTGRES_DB_NAME"`
+	Dbusername   string `env:"POSTGRES_USER"`
+	Dbpassword   string `env:"POSTGRES_PASSWORD"`
+	Dockerdbport string `env:"DOCKER_DB_PORT"`
 }
 
 type Ad struct {
-	Photo        string  `json:"photo"`
-	Id           int64   `json:"id"`
-	Title        string  `json:"title"`
-	Content      string  `json:"content"`
-	Price        float64 `json:"price"`
-	CreationDate string  `json:"datecreated"`
+	Photo        string          `json:"photo"`
+	Id           int64           `json:"id"`
+	Title        string          `json:"title"`
+	Content      string          `json:"content"`
+	Price        decimal.Decimal `json:"price"`
+	CreationDate time.Time       `json:"datecreated"`
 }
 
 type Result struct {
 	Id     int64
 	Status bool
 	Reason string
+}
+
+type QueryCredentials struct {
+	Order  string
+	By     string
+	Limit  string
+	Offset int
 }

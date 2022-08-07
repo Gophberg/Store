@@ -76,9 +76,15 @@ func (a Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 
 	a.decodeData(w, r)
 
-	ads, err := a.readRecords()
+	var qc QueryCredentials
+	qc.Order = "price"
+	qc.By = "DESC"
+	qc.Limit = "5"
+	qc.Offset = 2
+
+	ads, err := a.readRecords(qc)
 	if err != nil {
-		log.Println("[REST]", err)
+		log.Println("[REST from DB]", err)
 	}
 
 	js, err := json.Marshal(ads)

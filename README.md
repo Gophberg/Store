@@ -26,4 +26,5 @@ Where `N` is a number of Ad ID to get.
 *Do request*  
 `curl -X POST http://localhost:9000/getAllAds`
 
+Note: In this point sort and pagination is hardcoded in rest.go/getAllAds method  
 Note: Then just created my db contains the two test records

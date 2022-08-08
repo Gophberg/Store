@@ -20,6 +20,11 @@ type Ad struct {
 	Content      string          `json:"content"`
 	Price        decimal.Decimal `json:"price"`
 	CreationDate time.Time       `json:"datecreated"`
+	//queryCredentials QueryCredentials
+	//Order  string `json:"order"`
+	//By     string `json:"by"`
+	//Limit  string `json:"limit"`
+	//Offset int    `json:"offset"`
 }
 
 type Result struct {
@@ -29,8 +34,8 @@ type Result struct {
 }
 
 type QueryCredentials struct {
-	Order  string
-	By     string
-	Limit  string
-	Offset int
+	Order  string `json:"order"`
+	By     string `json:"by"`
+	Limit  string `json:"limit"`
+	Offset int    `json:"offset"`
 }

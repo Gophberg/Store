@@ -27,13 +27,14 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	default:
 		// Create new record
 		id, err := a.createRecord(a)
-		result.Id = id
-		result.Reason = "Add created"
-		result.Status = true
 		if err != nil {
 			log.Println("[REST]", err)
+		} else {
+			result.Id = id
+			result.Reason = "Add created"
+			result.Status = true
+			log.Println("[REST] New ad created with id:", id)
 		}
-		log.Println("[REST] New ad created with id:", id)
 	}
 
 	// Sending response
@@ -78,8 +79,6 @@ func (a Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 
 	qc.decodeData(w, r)
 
-	log.Println("[REST qc]", qc)
-
 	ads, err := a.readRecords(qc)
 	if err != nil {
 		log.Println("[REST from DB]", err)
@@ -115,9 +114,6 @@ func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request) {
 	if err := dec.Decode(&a); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	if err := dec.Decode(&a); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
 }
 
 func (qc *QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
@@ -134,9 +130,6 @@ func (qc *QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
 
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
-	if err := dec.Decode(&qc); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
 	if err := dec.Decode(&qc); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}

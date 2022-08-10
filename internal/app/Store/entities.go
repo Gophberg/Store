@@ -29,8 +29,8 @@ type Result struct {
 }
 
 type QueryCredentials struct {
-	Order  string
-	By     string
-	Limit  string
-	Offset int
+	OrderBy   string `json:"orderby"`
+	Direction string `json:"direction"`
+	Limit     string `json:"limit"`
+	Offset    int    `json:"offset"`
 }

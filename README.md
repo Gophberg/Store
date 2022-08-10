@@ -24,7 +24,13 @@ Where `N` is a number of Ad ID to get.
 ### Get all Ads
 
 *Do request*  
-`curl -X POST http://localhost:9000/getAllAds`
+`curl -X POST http://localhost:9000/getAllAds -H 
+"Content-Type: application/json" --data 
+'{"orderby": "price", 
+"direction": "DESC", 
+"limit": "10", 
+"offset": 10}'`
 
-Note: In this point sort and pagination is hardcoded in rest.go/getAllAds method  
-Note: Then just created my db contains the two test records
+Note: Then just created my db contains the two test records.  
+The `direction` statement can assume "ASC" for ascending of "DESC" for descending only.  
+The `limit` statement required to wrapped into double quotation. 

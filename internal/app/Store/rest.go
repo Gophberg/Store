@@ -74,17 +74,13 @@ func (a Ad) getAd(w http.ResponseWriter, r *http.Request) {
 func (a Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested all ads: %s\n", r.URL.Path)
 
-	a.decodeData(w, r)
+	var qc QueryCredentials
 
-	//var qc QueryCredentials
-	//qc.Order = "price"
-	//qc.By = "DESC"
-	//qc.Limit = "5"
-	//qc.Offset = 2
-	//qc = a.queryCredentials
+	qc.decodeData(w, r)
+
 	log.Println("[REST qc]", qc)
 
-	ads, err := a.readRecords(*qc)
+	ads, err := a.readRecords(qc)
 	if err != nil {
 		log.Println("[REST from DB]", err)
 	}
@@ -102,7 +98,7 @@ func (a Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request, qc *QueryCredentials) {
+func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -119,9 +115,29 @@ func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request, qc *QueryCredent
 	if err := dec.Decode(&a); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
+	if err := dec.Decode(&a); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func (qc *QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
+	contentType := r.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if mediatype != "application/json" {
+		http.Error(w, "expect application/json Content-Type", http.StatusUnsupportedMediaType)
+		return
+	}
+
+	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
 	if err := dec.Decode(&qc); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	log.Println("[REST decoder a]", &a)
-	log.Println("[REST decoder a]", &qc)
+	if err := dec.Decode(&qc); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 }

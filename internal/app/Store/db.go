@@ -100,7 +100,7 @@ func (a Ad) readRecords(qc QueryCredentials) ([]Ad, error) {
 	var ads []Ad
 
 	query := `SELECT * FROM "store" ORDER BY $1, $2 LIMIT $3 OFFSET $4`
-	rows, err := conn.Query(context.Background(), query, qc.By, qc.Order, qc.Limit, qc.Offset)
+	rows, err := conn.Query(context.Background(), query, qc.OrderBy, qc.Direction, qc.Limit, qc.Offset)
 	if err != nil {
 		log.Println("[DB query]", err)
 		return nil, err

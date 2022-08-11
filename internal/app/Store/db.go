@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -98,9 +99,21 @@ func (a Ad) readRecords(qc QueryCredentials) ([]Ad, error) {
 	}(conn, context.Background())
 
 	var ads []Ad
+	var f string
 
-	query := `SELECT * FROM "store" ORDER BY $1, $2 LIMIT $3 OFFSET $4`
-	rows, err := conn.Query(context.Background(), query, qc.OrderBy, qc.Direction, qc.Limit, qc.Offset)
+	if qc.Required {
+		fields := strings.Fields(qc.Fields)
+		f = strings.Join(fields, ",")
+	} else {
+		f = fmt.Sprint("*")
+	}
+
+	log.Println("[DB qc]", qc)
+	log.Println("[DB f]", f)
+
+	query := `SELECT $1 FROM "store" ORDER BY $2, $3 LIMIT $4 OFFSET $5`
+	log.Println("[DB query]", query)
+	rows, err := conn.Query(context.Background(), query, f, qc.OrderBy, qc.Direction, qc.Limit, qc.Offset)
 	if err != nil {
 		log.Println("[DB query]", err)
 		return nil, err

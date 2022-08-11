@@ -33,4 +33,12 @@ type QueryCredentials struct {
 	Direction string `json:"direction"`
 	Limit     string `json:"limit"`
 	Offset    int    `json:"offset"`
+	//Qc        QueryFields
+	Required bool   `json:"required"`
+	Fields   string `json:"fields"`
 }
+
+//type QueryFields struct {
+//	Required bool   `json:"required"`
+//	Fields   string `json:"fields"`
+//}

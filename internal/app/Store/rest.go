@@ -24,6 +24,10 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 		log.Println("[REST] The content is to large")
 		result.Reason = "The content is to large"
 		result.Status = false
+	case len(a.Photo) > 3:
+		log.Println("[REST] Limit of 3 photos exceeded")
+		result.Reason = "Limit of 3 photos exceeded"
+		result.Status = false
 	default:
 		// Create new record
 		id, err := a.createRecord(a)

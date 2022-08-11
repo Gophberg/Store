@@ -24,32 +24,4 @@ func (c *Config) NewConfig() {
 	c.Dbpassword = read["POSTGRES_PASSWORD"]
 	c.Dockerdbport = read["DOCKER_DB_PORT"]
 
-	//log.Println("[CONFIG] env:", os.Getenv("POSTGRES_HOST"))
-	//log.Println("[CONFIG] env:", read)
-
-	//f, err := os.Open("configs/store.yaml")
-	//defer func(f *os.File) {
-	//	err := f.Close()
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//}(f)
-	//fields, err := io.ReadAll(f)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//err = yaml.Unmarshal(fields, &c)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
 }
-
-//func NewConfig() (*Config, error) {
-//	ctx := context.Background()
-//	var c Config
-//	if err := envconfig.Process(ctx, &c); err != nil {
-//		return nil, err
-//	}
-//
-//	return &c, nil
-//}

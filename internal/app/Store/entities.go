@@ -14,7 +14,7 @@ type Config struct {
 }
 
 type Ad struct {
-	Photo        string          `json:"photo"`
+	Photo        []string        `json:"photo"`
 	Id           int64           `json:"id"`
 	Title        string          `json:"title"`
 	Content      string          `json:"content"`

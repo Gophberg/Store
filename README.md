@@ -15,7 +15,12 @@ There were given 2-4 hours for development. You may see my development time by c
 ### Creating the ad
 
 *Do request in another terminal*  
-`curl -X POST http://localhost:9000/createAd -H "Content-Type: application/json" --data '{"title": "Title of Ad", "content": "Some content", "photo": "some/path/img.jpg", "price": 11.22}'`
+`curl -X POST http://localhost:9000/createAd -H 
+"Content-Type: application/json" --data '{
+"title": "Title of Ad", 
+"content": "Some content", 
+"photo": ["some/path/img.jpg", "./another/one.jpg", "./valenkiOptom.jpg"], 
+"price": 11.22}'`
 
 You can to post your credentials in this request.  
 

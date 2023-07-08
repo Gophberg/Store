@@ -1,14 +1,16 @@
 package Store
 
 import (
+	"github.com/Gophberg/Store/internal/config"
 	"net/http"
 )
 
-var config Config
-
 func Start() error {
 
-	config.NewConfig()
+	cfg, err := config.NewConfig()
+	if err != nil {
+		return err
+	}
 
 	s := Ad{}
 

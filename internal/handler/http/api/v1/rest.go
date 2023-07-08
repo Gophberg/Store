@@ -1,18 +1,19 @@
-package Store
+package v1
 
 import (
 	"encoding/json"
+	"github.com/Gophberg/Store/internal/app/Store"
 	"log"
 	"mime"
 	"net/http"
 )
 
-func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
+func (a Store.Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested create ad: %s\n", r.URL.Path)
 
 	a.decodeData(w, r)
 
-	var result Result
+	var result Store.Result
 
 	// Validations
 	switch {
@@ -54,7 +55,7 @@ func (a Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a Ad) getAd(w http.ResponseWriter, r *http.Request) {
+func (a Store.Ad) getAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested ad: %s\n", r.URL.Path)
 
 	a.decodeData(w, r)
@@ -76,10 +77,10 @@ func (a Ad) getAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
+func (a Store.Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested all ads: %s\n", r.URL.Path)
 
-	var qc QueryCredentials
+	var qc Store.QueryCredentials
 
 	qc.decodeData(w, r)
 
@@ -101,7 +102,7 @@ func (a Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request) {
+func (a *Store.Ad) decodeData(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {
@@ -120,7 +121,7 @@ func (a *Ad) decodeData(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (qc *QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
+func (qc *Store.QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {

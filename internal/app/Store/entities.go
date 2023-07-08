@@ -5,14 +5,6 @@ import (
 	"time"
 )
 
-type Config struct {
-	Dbhost       string `env:"POSTGRES_HOST"`
-	Dbname       string `env:"POSTGRES_DB_NAME"`
-	Dbusername   string `env:"POSTGRES_USER"`
-	Dbpassword   string `env:"POSTGRES_PASSWORD"`
-	Dockerdbport string `env:"DOCKER_DB_PORT"`
-}
-
 type Ad struct {
 	Photo        []string        `json:"photo"`
 	Id           int64           `json:"id"`

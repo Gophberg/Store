@@ -1,9 +1,10 @@
-package Store
+package adapter
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/Gophberg/Store/internal/app/Store"
 	"github.com/jackc/pgtype"
 	shopspring "github.com/jackc/pgtype/ext/shopspring-numeric"
 	"github.com/jackc/pgx/v4"
@@ -28,7 +29,7 @@ func connDB() (*pgx.Conn, error) {
 	return conn, err
 }
 
-func (a *Ad) createRecord(c Ad) (int64, error) {
+func (a *Store.Ad) createRecord(c Store.Ad) (int64, error) {
 	log.Printf("[DB] Reseived createRecord Credentials: %v", c)
 
 	conn, err := connDB()
@@ -56,7 +57,7 @@ func (a *Ad) createRecord(c Ad) (int64, error) {
 	return a.Id, err
 }
 
-func (a Ad) readRecord(c Ad) (Ad, error) {
+func (a Store.Ad) readRecord(c Store.Ad) (Store.Ad, error) {
 	log.Printf("[DB] Requested ad with id: <%v>\n", c.Id)
 
 	conn, err := connDB()
@@ -85,7 +86,7 @@ func (a Ad) readRecord(c Ad) (Ad, error) {
 	return a, nil
 }
 
-func (a Ad) readRecords(qc QueryCredentials) ([]Ad, error) {
+func (a Store.Ad) readRecords(qc Store.QueryCredentials) ([]Store.Ad, error) {
 	log.Printf("[DB] Requested all ads with credentials: <%v>\n", qc)
 	conn, err := connDB()
 	if err != nil {
@@ -98,7 +99,7 @@ func (a Ad) readRecords(qc QueryCredentials) ([]Ad, error) {
 		}
 	}(conn, context.Background())
 
-	var ads []Ad
+	var ads []Store.Ad
 	var f string
 
 	if qc.Required {
@@ -119,7 +120,7 @@ func (a Ad) readRecords(qc QueryCredentials) ([]Ad, error) {
 		return nil, err
 	}
 	for rows.Next() {
-		var i Ad
+		var i Store.Ad
 		if err := rows.Scan(
 			&i.Id,
 			&i.Title,

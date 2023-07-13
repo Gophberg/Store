@@ -1,32 +1,25 @@
-package adapter
+package postgres
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 	"github.com/Gophberg/Store/internal/app/Store"
-	"github.com/jackc/pgtype"
-	shopspring "github.com/jackc/pgtype/ext/shopspring-numeric"
+	"github.com/Gophberg/Store/pkg/postgres"
 	"github.com/jackc/pgx/v4"
 	"log"
-	"os"
 	"strings"
 	"time"
 )
 
-func connDB() (*pgx.Conn, error) {
-	url := fmt.Sprintf("postgres://%v:%v@%v:%v/%v", config.Dbusername, config.Dbpassword, config.Dbhost, config.Dockerdbport, config.Dbname)
-	conn, err := pgx.Connect(context.Background(), url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+type StoreRepo struct {
+	*postgres.Postgres
+}
+
+func New(pg *postgres.Postgres) *StoreRepo {
+	return &StoreRepo{
+		Postgres: pg,
 	}
-	conn.ConnInfo().RegisterDataType(pgtype.DataType{
-		Value: &shopspring.Numeric{},
-		Name:  "numeric",
-		OID:   pgtype.NumericOID,
-	})
-	return conn, err
 }
 
 func (a *Store.Ad) createRecord(c Store.Ad) (int64, error) {

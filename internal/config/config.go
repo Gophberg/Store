@@ -3,14 +3,18 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"time"
 )
 
 type Config struct {
-	Dbhost       string `env:"POSTGRES_HOST"`
-	Dbname       string `env:"POSTGRES_DB_NAME"`
-	Dbusername   string `env:"POSTGRES_USER"`
-	Dbpassword   string `env:"POSTGRES_PASSWORD"`
-	Dockerdbport string `env:"DOCKER_DB_PORT"`
+	Dbhost       string        `env:"POSTGRES_HOST"`
+	Dbname       string        `env:"POSTGRES_DB_NAME"`
+	Dbusername   string        `env:"POSTGRES_USER"`
+	Dbpassword   string        `env:"POSTGRES_PASSWORD"`
+	Dockerdbport string        `env:"DOCKER_DB_PORT"`
+	MaxPoolSize  int           `env:"MAX_POOL_SIZE"`
+	ConnAttempts int           `env:"CONN_ATTEMPTS"`
+	ConnTimeout  time.Duration `env:"CONN_TIMEOUT"`
 }
 
 func NewConfig() (Config, error) {

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgtype"
 	shopspring "github.com/jackc/pgtype/ext/shopspring-numeric"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,7 +15,8 @@ type Postgres struct {
 	connAttempts int
 	connTimeout  time.Duration
 
-	Pool *pgxpool.Pool
+	Builder squirrel.StatementBuilderType
+	Pool    *pgxpool.Pool
 }
 
 func New(config *Config) (*Postgres, error) {

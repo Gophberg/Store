@@ -4,8 +4,8 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=repo
+      - POSTGRES_PASSWORD=repo
       - POSTGRES_DB=store
     ports:
       - "5432:5432"

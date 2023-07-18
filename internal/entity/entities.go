@@ -1,4 +1,4 @@
-package Store
+package entity
 
 import (
 	"github.com/shopspring/decimal"
@@ -23,8 +23,8 @@ type Result struct {
 type QueryCredentials struct {
 	OrderBy   string `json:"orderby"`
 	Direction string `json:"direction"`
-	Limit     string `json:"limit"`
-	Offset    int    `json:"offset"`
+	Limit     uint64 `json:"limit"`
+	Offset    uint64 `json:"offset"`
 	//Qc        QueryFields
 	Required bool   `json:"required"`
 	Fields   string `json:"fields"`

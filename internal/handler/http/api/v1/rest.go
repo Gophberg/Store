@@ -2,18 +2,18 @@ package v1
 
 import (
 	"encoding/json"
-	"github.com/Gophberg/Store/internal/app/Store"
+	"github.com/Gophberg/Store/internal/entity"
 	"log"
 	"mime"
 	"net/http"
 )
 
-func (a Store.Ad) createAd(w http.ResponseWriter, r *http.Request) {
-	log.Printf("[REST] Requested create ad: %s\n", r.URL.Path)
+func (a entity.Ad) createAd(w http.ResponseWriter, r *http.Request) {
+	//log.Printf("[REST] Requested create ad: %s\n", r.URL.Path)
 
 	a.decodeData(w, r)
 
-	var result Store.Result
+	var result entity.Result
 
 	// Validations
 	switch {
@@ -55,7 +55,7 @@ func (a Store.Ad) createAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a Store.Ad) getAd(w http.ResponseWriter, r *http.Request) {
+func (a entity.Ad) getAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested ad: %s\n", r.URL.Path)
 
 	a.decodeData(w, r)
@@ -77,10 +77,10 @@ func (a Store.Ad) getAd(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a Store.Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
+func (a entity.Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] Requested all ads: %s\n", r.URL.Path)
 
-	var qc Store.QueryCredentials
+	var qc entity.QueryCredentials
 
 	qc.decodeData(w, r)
 
@@ -102,26 +102,7 @@ func (a Store.Ad) getAllAds(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[REST] %v bytes written to ResponseWriter", write)
 }
 
-func (a *Store.Ad) decodeData(w http.ResponseWriter, r *http.Request) {
-	contentType := r.Header.Get("Content-Type")
-	mediatype, _, err := mime.ParseMediaType(contentType)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if mediatype != "application/json" {
-		http.Error(w, "expect application/json Content-Type", http.StatusUnsupportedMediaType)
-		return
-	}
-
-	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&a); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-}
-
-func (qc *Store.QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
+func (qc *entity.QueryCredentials) decodeData(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
 	mediatype, _, err := mime.ParseMediaType(contentType)
 	if err != nil {

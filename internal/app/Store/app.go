@@ -5,7 +5,7 @@ import (
 	"github.com/Gophberg/Store/internal/config"
 	"github.com/Gophberg/Store/internal/repository/repo"
 	"github.com/Gophberg/Store/internal/usecase"
-	"net/http"
+	"github.com/Gophberg/Store/pkg/postgres"
 )
 
 func Start() error {
@@ -15,23 +15,25 @@ func Start() error {
 		return err
 	}
 
-	pg, err := repo.New(&cfg)
+	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", cfg.Dbusername, cfg.Dbpassword, cfg.Dbhost, cfg.Dockerdbport, cfg.Dbname)
+
+	// Repository
+	pg, err := postgres.New(url, postgres.MaxPoolSize(cfg.MaxPoolSize), postgres.ConnAttempts(cfg.ConnAttempts), postgres.ConnTimeout(cfg.ConnTimeout))
 	if err != nil {
 		return fmt.Errorf("error initializing postgres: %w", err)
 	}
+	defer pg.Close()
 
-	//s := entity.Ad{}
-
+	// UseCase
 	storeUseCase := usecase.NewUseCase(
 		repo.New(pg),
 	)
 
-	//var qc *QueryCredentials
-
-	http.HandleFunc("/getAd", s.getAd)
-	http.HandleFunc("/getAllAds", s.getAllAds)
-	http.HandleFunc("/createAd", s.createAd)
-
-	return http.ListenAndServe(":9000", nil)
+	//// Handler
+	//http.HandleFunc("/getAd", s.getAd)
+	//http.HandleFunc("/getAllAds", s.getAllAds)
+	//http.HandleFunc("/createAd", s.createAd)
+	//
+	//return http.ListenAndServe(":9000", nil)
 
 }

@@ -1,19 +1,44 @@
 package usecase
 
-import "net/http"
+import (
+	"context"
+	"fmt"
+	"github.com/Gophberg/Store/internal/entity"
+)
 
-type ads interface {
-	CreateAd(w http.ResponseWriter, r *http.Request)
-	GetAllAds(w http.ResponseWriter, r *http.Request)
-	GetAd(w http.ResponseWriter, r *http.Request)
+type AdsUseCase struct {
+	repo Repository
 }
 
-type UseCase struct {
-	ads ads
-}
-
-func NewUseCase(ads ads) *UseCase {
-	return &UseCase{
-		ads: ads,
+func NewUseCase(r Repository) *AdsUseCase {
+	return &AdsUseCase{
+		repo: r,
 	}
+}
+
+func (u *AdsUseCase) CreateAd(ctx context.Context, a entity.Ad) error {
+	err := u.repo.CreateRecord(ctx, a)
+	if err != nil {
+		return fmt.Errorf("AdsUseCase - CreateAd - u.repo.CreateRecord: %w", err)
+	}
+
+	return nil
+}
+
+func (u *AdsUseCase) GetAllAds(ctx context.Context, qc entity.QueryCredentials) ([]entity.Ad, error) {
+	ad, err := u.repo.ReadRecords(ctx, qc)
+	if err != nil {
+		return []entity.Ad{}, fmt.Errorf("AdsUseCase - GetAd - u.repo.GetAd: %w", err)
+	}
+
+	return ad, nil
+}
+
+func (u *AdsUseCase) GetAd(ctx context.Context, a entity.Ad) (entity.Ad, error) {
+	ad, err := u.repo.ReadRecord(ctx, a.Id)
+	if err != nil {
+		return entity.Ad{}, fmt.Errorf("AdsUseCase - GetAd - u.repo.GetAd: %w", err)
+	}
+
+	return ad, nil
 }

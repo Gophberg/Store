@@ -6,7 +6,7 @@ import (
 	"github.com/Gophberg/Store/internal/entity"
 )
 
-func (s *StoreRepo) createRecord(ctx context.Context, a entity.Ad) error {
+func (s *StoreRepo) CreateRecord(ctx context.Context, a entity.Ad) (uint64, error) {
 
 	//a.CreationDate = time.Now()
 
@@ -14,15 +14,16 @@ func (s *StoreRepo) createRecord(ctx context.Context, a entity.Ad) error {
 		Insert("store").
 		Columns("title", "content", "photo", "price", "createdate").
 		Values(a.Title, a.Content, a.Photo, a.Price, a.CreationDate).
+		Suffix("RETURNING id").
 		ToSql()
 	if err != nil {
-		return fmt.Errorf("StoreRepo - createRecord - s.Builder: %w", err)
+		return 0, fmt.Errorf("StoreRepo - CreateRecord - s.Builder: %w", err)
 	}
 
-	_, err = s.Pool.Exec(ctx, sql, args...)
+	err = s.Pool.QueryRow(ctx, sql, args...).Scan(&a.Id)
 	if err != nil {
-		return fmt.Errorf("StoreRepo - createRecord - s.Pool.Exec: %w", err)
+		return 0, fmt.Errorf("StoreRepo - CreateRecord - s.Pool.Exec: %w", err)
 	}
 
-	return nil
+	return a.Id, nil
 }

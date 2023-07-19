@@ -9,7 +9,5 @@ type StoreRepo struct {
 }
 
 func New(pg *postgres.Postgres) *StoreRepo {
-	return &StoreRepo{
-		Postgres: pg,
-	}
+	return &StoreRepo{pg}
 }

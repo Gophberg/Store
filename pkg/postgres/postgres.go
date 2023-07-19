@@ -4,10 +4,15 @@ import (
 	"context"
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"github.com/jackc/pgtype"
-	shopspring "github.com/jackc/pgtype/ext/shopspring-numeric"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log"
 	"time"
+)
+
+const (
+	_defaultMaxPoolSize  = 1
+	_defaultConnAttempts = 10
+	_defaultConnTimeout  = time.Second
 )
 
 type Postgres struct {
@@ -19,28 +24,50 @@ type Postgres struct {
 	Pool    *pgxpool.Pool
 }
 
-func New(config *Config) (*Postgres, error) {
+func New(url string, opts ...Option) (*Postgres, error) {
 	pg := &Postgres{
-		maxPoolSize:  config.MaxPoolSize,
-		connAttempts: config.ConnAttempts,
-		connTimeout:  config.ConnTimeout,
+		maxPoolSize:  _defaultMaxPoolSize,
+		connAttempts: _defaultConnAttempts,
+		connTimeout:  _defaultConnTimeout,
 	}
 
-	url := fmt.Sprintf("postgres://%v:%v@%v:%v/%v", config.Dbusername, config.Dbpassword, config.Dbhost, config.Dockerdbport, config.Dbname)
-	//url := fmt.Sprintf("postgres://%v:%v@%v:%v/%v", config.Dbusername, config.Dbpassword, config.Dbhost, config.Dockerdbport, config.Dbname)
+	// Custom options
+	for _, opt := range opts {
+		opt(pg)
+	}
 
-	dbpool, err := pgxpool.New(context.Background(), url)
-	//dbpool, err := pgx.Connect(context.Background(), url)
+	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
+	poolConfig, err := pgxpool.ParseConfig(url)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to connect to database: %w\n", err)
+		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
 	}
-	defer dbpool.Close()
 
-	dbpool.ConnInfo().RegisterDataType(pgtype.DataType{
-		Value: &shopspring.Numeric{},
-		Name:  "numeric",
-		OID:   pgtype.NumericOID,
-	})
+	poolConfig.MaxConns = int32(pg.maxPoolSize)
 
-	return dbpool, nil
+	for pg.connAttempts > 0 {
+		pg.Pool, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
+		if err == nil {
+			break
+		}
+
+		log.Printf("Postgres is trying to connect, attempts left: %d", pg.connAttempts)
+
+		time.Sleep(pg.connTimeout)
+
+		pg.connAttempts--
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("postgres - NewPostgres - connAttempts == 0: %w", err)
+	}
+
+	return pg, nil
+}
+
+// Close -.
+func (p *Postgres) Close() {
+	if p.Pool != nil {
+		p.Pool.Close()
+	}
 }

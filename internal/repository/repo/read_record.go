@@ -6,27 +6,29 @@ import (
 	"github.com/Gophberg/Store/internal/entity"
 )
 
-func (s *StoreRepo) readRecord(ctx context.Context, c entity.Ad) (entity.Ad, error) {
+func (s *StoreRepo) ReadRecord(ctx context.Context, id uint64) (entity.Ad, error) {
+
+	var ad entity.Ad
 
 	sql, _, err := s.Builder.
 		Select("id", "title", "content", "photo", "price", "createdate").
 		From("store").
-		Where("id = ?", c.Id).
+		Where("id = ?", id).
 		ToSql()
 	if err != nil {
-		return entity.Ad{}, fmt.Errorf("StoreRepo - readRecord - s.Builder: %w", err)
+		return ad, fmt.Errorf("StoreRepo - ReadRecord - s.Builder: %w", err)
 	}
 
 	if err = s.Pool.QueryRow(ctx, sql).Scan(
-		&c.Id,
-		&c.Title,
-		&c.Content,
-		&c.Photo,
-		&c.Price,
-		&c.CreationDate,
+		&ad.Id,
+		&ad.Title,
+		&ad.Content,
+		&ad.Photo,
+		&ad.Price,
+		&ad.CreationDate,
 	); err != nil {
-		return entity.Ad{}, fmt.Errorf("StoreRepo - readRecord - s.Pool.QueryRow: %w", err)
+		return ad, fmt.Errorf("StoreRepo - ReadRecord - s.Pool.QueryRow: %w", err)
 	}
 
-	return c, nil
+	return ad, nil
 }

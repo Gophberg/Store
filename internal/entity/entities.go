@@ -7,7 +7,7 @@ import (
 
 type Ad struct {
 	Photo        []string        `json:"photo"`
-	Id           int64           `json:"id"`
+	Id           uint64          `json:"id"`
 	Title        string          `json:"title"`
 	Content      string          `json:"content"`
 	Price        decimal.Decimal `json:"price"`
@@ -15,7 +15,7 @@ type Ad struct {
 }
 
 type Result struct {
-	Id     int64
+	Id     uint64
 	Status bool
 	Reason string
 }

@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"strconv"
 	"time"
 )
 
@@ -11,7 +12,7 @@ type Config struct {
 	Dbname       string        `env:"POSTGRES_DB_NAME"`
 	Dbusername   string        `env:"POSTGRES_USER"`
 	Dbpassword   string        `env:"POSTGRES_PASSWORD"`
-	Dockerdbport string        `env:"DOCKER_DB_PORT"`
+	Dockerdbport int           `env:"DOCKER_DB_PORT"`
 	MaxPoolSize  int           `env:"MAX_POOL_SIZE"`
 	ConnAttempts int           `env:"CONN_ATTEMPTS"`
 	ConnTimeout  time.Duration `env:"CONN_TIMEOUT"`
@@ -35,7 +36,23 @@ func NewConfig() (Config, error) {
 	config.Dbname = read["POSTGRES_DB_NAME"]
 	config.Dbusername = read["POSTGRES_USER"]
 	config.Dbpassword = read["POSTGRES_PASSWORD"]
-	config.Dockerdbport = read["DOCKER_DB_PORT"]
+	config.Dockerdbport, err = strconv.Atoi(read["DOCKER_DB_PORT"])
+	if err != nil {
+		return config, fmt.Errorf("error reading DOCKER_DB_PORT from .env file %w", err)
+	}
+	config.MaxPoolSize, err = strconv.Atoi(read["MAX_POOL_SIZE"])
+	if err != nil {
+		return config, fmt.Errorf("error reading MAX_POOL_SIZE from .env file %w", err)
+	}
+	config.ConnAttempts, err = strconv.Atoi(read["CONN_ATTEMPTS"])
+	if err != nil {
+		return config, fmt.Errorf("error reading CONN_ATTEMPTS from .env file %w", err)
+	}
+	connTimeout, err := strconv.Atoi(read["CONN_TIMEOUT"])
+	if err != nil {
+		return config, fmt.Errorf("error reading CONN_TIMEOUT from .env file %w", err)
+	}
+	config.ConnTimeout = time.Duration(connTimeout) * time.Second
 
 	return config, nil
 }

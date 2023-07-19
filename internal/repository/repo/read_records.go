@@ -6,19 +6,19 @@ import (
 	"github.com/Gophberg/Store/internal/entity"
 )
 
-func (s *StoreRepo) readRecords(ctx context.Context, qc entity.QueryCredentials) ([]entity.Ad, error) {
+func (s *StoreRepo) ReadRecords(ctx context.Context, qc entity.QueryCredentials) ([]entity.Ad, error) {
 
 	sql, _, err := s.Builder.
 		Select("id", "title", "content", "photo", "price", "createdate").
 		From("store").OrderByClause(qc.OrderBy, qc.Direction).Limit(qc.Limit).Offset(qc.Offset).
 		ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("StoreRepo - readRecords - s.Builder: %w", err)
+		return nil, fmt.Errorf("StoreRepo - ReadRecords - s.Builder: %w", err)
 	}
 
 	rows, err := s.Pool.Query(ctx, sql)
 	if err != nil {
-		return nil, fmt.Errorf("StoreRepo - readRecords - s.Pool.Query: %w", err)
+		return nil, fmt.Errorf("StoreRepo - ReadRecords - s.Pool.Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -35,7 +35,7 @@ func (s *StoreRepo) readRecords(ctx context.Context, qc entity.QueryCredentials)
 			&e.Price,
 			&e.CreationDate,
 		); err != nil {
-			return nil, fmt.Errorf("StoreRepo - readRecords - rows.Scan: %w", err)
+			return nil, fmt.Errorf("StoreRepo - ReadRecords - rows.Scan: %w", err)
 		}
 
 		entities = append(entities, e)

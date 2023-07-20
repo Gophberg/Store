@@ -3,12 +3,21 @@ package Store
 import (
 	"fmt"
 	"github.com/Gophberg/Store/internal/config"
+	v1 "github.com/Gophberg/Store/internal/handler/http/api/v1"
 	"github.com/Gophberg/Store/internal/repository/repo"
 	"github.com/Gophberg/Store/internal/usecase"
 	"github.com/Gophberg/Store/pkg/postgres"
+	"github.com/gorilla/mux"
+	"net/http"
 )
 
+type App struct {
+	router *mux.Router
+}
+
 func Start() error {
+
+	var a App
 
 	cfg, err := config.NewConfig()
 	if err != nil {
@@ -24,16 +33,16 @@ func Start() error {
 	}
 	defer pg.Close()
 
-	// UseCase
+	// HandlerUseCase
 	storeUseCase := usecase.NewUseCase(
 		repo.New(pg),
 	)
 
-	//// Handler
-	//http.HandleFunc("/getAd", s.getAd)
-	//http.HandleFunc("/getAllAds", s.getAllAds)
-	//http.HandleFunc("/createAd", s.createAd)
-	//
-	//return http.ListenAndServe(":9000", nil)
+	handler := v1.NewHandler(storeUseCase)
+	a.router = mux.NewRouter()
+	a.router.HandleFunc("/createAd", handler.CreateAd).Methods("POST")
+	a.router.HandleFunc("/getAllAds", handler.GetAllAds).Methods("GET")
+	a.router.HandleFunc("/getAd", handler.GetAd).Methods("GET")
 
+	return http.ListenAndServe(":9000", a.router)
 }

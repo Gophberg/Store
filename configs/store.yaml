@@ -1,8 +1,0 @@
-dbhost: localhost
-dbname: store
-dbusername: repo
-dbpassword: repo
-dockerdbport: 5432
-max_pool_size: 1
-conn_attempts: 10
-conn_timeout: 1

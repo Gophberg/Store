@@ -1,10 +1,5 @@
 ## Ads store
 
-_Description:_
-
-This is a test task for an IT company.  
-There were given 2-4 hours for development. You may see my development time by commits history.  
-
 *Execute:*
 - `docker-compose up` to run postgres db  
   Note: Database storage will create outside the docker container in the `pgdata` directory

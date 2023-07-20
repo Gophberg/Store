@@ -16,13 +16,13 @@ func NewUseCase(r Repository) *AdsUseCase {
 	}
 }
 
-func (u *AdsUseCase) CreateAd(ctx context.Context, a entity.Ad) error {
-	err := u.repo.CreateRecord(ctx, a)
+func (u *AdsUseCase) CreateAd(ctx context.Context, a entity.Ad) (uint64, error) {
+	id, err := u.repo.CreateRecord(ctx, a)
 	if err != nil {
-		return fmt.Errorf("AdsUseCase - CreateAd - u.repo.CreateRecord: %w", err)
+		return 0, fmt.Errorf("AdsUseCase - CreateAd - u.repo.CreateRecord: %w", err)
 	}
 
-	return nil
+	return id, nil
 }
 
 func (u *AdsUseCase) GetAllAds(ctx context.Context, qc entity.QueryCredentials) ([]entity.Ad, error) {

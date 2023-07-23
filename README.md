@@ -33,7 +33,7 @@ Where `N` is a number of Ad ID to get.
 "Content-Type: application/json" --data 
 '{"orderby": "price", 
 "direction": "DESC", 
-"limit": "10", 
+"limit": 10, 
 "offset": 10}'`
 
 Note: Then just created my db contains the two test records.  
